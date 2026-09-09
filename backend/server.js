@@ -202,17 +202,27 @@ app.use(session({
   cookie: { maxAge: 24 * 60 * 60 * 1000, httpOnly: true }
 }));
 
-const staticOptions = { maxAge: 0, etag: false, index: false };
+const staticOptions = { maxAge: '2h', etag: true, index: false };
 
-// Prevent aggressive browser caching during updates so new logos and styles load immediately
+// Prevent caching only on dynamic HTML documents and API endpoints, while allowing static assets to be cached efficiently
 app.use((req, res, next) => {
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
+  const p = req.path.toLowerCase();
+  const isHtmlOrDynamic = p === '/' ||
+                          p.endsWith('.html') ||
+                          p.startsWith('/api') ||
+                          p.startsWith('/admin') ||
+                          p.startsWith('/auth') ||
+                          p === '/login' ||
+                          p === '/dashboard';
+  if (isHtmlOrDynamic) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
   next();
 });
 
-app.use(express.static(path.join(__dirname, 'public'), { index: false }));
+app.use(express.static(path.join(__dirname, 'public'), staticOptions));
 
 // Serve root marketing static files (images, css, js, fonts, pages, sections)
 const rootDir = path.join(__dirname, '..');
