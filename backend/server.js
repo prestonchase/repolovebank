@@ -8,7 +8,7 @@ const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'CHANGE_ME';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin2026';
 
 // ─── DATABASE SETUP ─────────────────────────────────────────────────────────
 const dataDir = path.join(__dirname, 'data');
